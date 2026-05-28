@@ -1,0 +1,18 @@
+=== ZhiXing-BI 后端启动命令 ===
+
+1. 确保 Docker 中间件已启动：
+   docker compose up -d
+
+2. 确保 Ollama 向量模型已拉取：
+   docker exec zhixing-ollama ollama pull nomic-embed-text
+
+3. 启动后端（端口 8099，日志实时输出）：
+   set LLM_API_KEY=sk-8f4c2bb0db28484294dfa754e19fbd81
+   mvn spring-boot:run -Dspring-boot.run.arguments="--spring.ai.openai.api-key=%LLM_API_KEY%"
+
+   看到 "Started ZhiXingApplication" 即启动成功。
+   Ctrl+C 停止服务。
+
+=== 查看日志 ===
+   启动后终端窗口会实时显示日志。
+   如果终端关闭了，日志在项目根目录 target/ 下。
