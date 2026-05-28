@@ -55,4 +55,14 @@ public class ChatSessionController {
         sessionService.clearMessages(userId, sessionId);
         return Result.success();
     }
+
+    /**
+     * 删除会话及其所有消息（含安全校验）
+     */
+    @DeleteMapping("/delete")
+    public Result<?> delete(@RequestParam("userId") String userId,
+                            @RequestParam("sessionId") String sessionId) {
+        sessionService.deleteSession(userId, sessionId);
+        return Result.success();
+    }
 }

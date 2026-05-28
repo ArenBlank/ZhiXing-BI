@@ -105,6 +105,31 @@ public class ChatSessionService {
     }
 
     /**
+     * 安全校验后删除会话及所有消息
+     */
+    public void deleteSession(String userId, String sessionId) {
+        BiChatSession session = sessionMapper.selectOne(
+                new LambdaQueryWrapper<BiChatSession>()
+                        .eq(BiChatSession::getSessionId, sessionId)
+        );
+
+        if (session == null) {
+            throw new IllegalArgumentException("会话不存在: " + sessionId);
+        }
+        if (!session.getUserId().equals(userId)) {
+            log.warn("越权拦截（delete）: userId={} 试图删除 sessionId={}", userId, sessionId);
+            throw new IllegalArgumentException("无权操作该会话");
+        }
+
+        messageMapper.delete(
+                new LambdaQueryWrapper<BiChatMessage>()
+                        .eq(BiChatMessage::getSessionId, sessionId)
+        );
+        sessionMapper.deleteById(session.getId());
+        log.info("会话已删除: sessionId={}, userId={}", sessionId, userId);
+    }
+
+    /**
      * 安全校验后清空会话的所有消息
      */
     public void clearMessages(String userId, String sessionId) {

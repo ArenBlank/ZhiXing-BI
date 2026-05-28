@@ -26,7 +26,7 @@ export default function HistorySidebar({ userId, activeSessionId, onSwitch, onNe
   const handleDelete = async (e, sessionId) => {
     e.preventDefault();
     e.stopPropagation();
-    await fetch(`${API_BASE}/api/session/clear?userId=${userId}&sessionId=${sessionId}`, { method: "DELETE" });
+    await fetch(`${API_BASE}/api/session/delete?userId=${userId}&sessionId=${sessionId}`, { method: "DELETE" });
     setSessions(prev => prev.filter(s => s.sessionId !== sessionId));
     onDelete?.(sessionId);
   };
