@@ -3,15 +3,15 @@
 import { useState, useEffect, useRef } from "react";
 import { API_BASE, authHeaders } from "@/lib/api";
 
-export default function HistorySidebar({ userId, activeSessionId, onSwitch, onNew, onDelete, refreshKey }) {
+export default function HistorySidebar({ activeSessionId, onSwitch, onNew, onDelete, refreshKey }) {
   const [sessions, setSessions] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
   const listRef = useRef(null);
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/session/list?userId=${userId}`, { headers: authHeaders() })
+    fetch(`${API_BASE}/api/session/list`, { headers: authHeaders() })
       .then(r => r.json()).then(json => { if (json.code === 200) setSessions(json.data); }).catch(() => {});
-  }, [userId, refreshKey]);
+  }, [refreshKey]);
 
   useEffect(() => {
     if (!listRef.current || sessions.length === 0) return;
@@ -26,7 +26,7 @@ export default function HistorySidebar({ userId, activeSessionId, onSwitch, onNe
   const handleDelete = async (e, sessionId) => {
     e.preventDefault();
     e.stopPropagation();
-    await fetch(`${API_BASE}/api/session/delete?userId=${userId}&sessionId=${sessionId}`, { method: "DELETE", headers: authHeaders() });
+    await fetch(`${API_BASE}/api/session/delete?sessionId=${sessionId}`, { method: "DELETE", headers: authHeaders() });
     setSessions(prev => prev.filter(s => s.sessionId !== sessionId));
     onDelete?.(sessionId);
   };
@@ -45,10 +45,8 @@ export default function HistorySidebar({ userId, activeSessionId, onSwitch, onNe
               className={`session-item group px-3 py-2 rounded-lg cursor-pointer transition-colors text-xs flex items-center ${s.sessionId === activeSessionId ? "bg-blue-100 text-blue-700" : "text-slate-500 hover:bg-slate-50"}`}
               onClick={() => onSwitch(s.sessionId)}>
               <span className="truncate flex-1">{s.title || "新会话"}</span>
-              <button
-                onClick={(e) => handleDelete(e, s.sessionId)}
-                className="ml-1 text-slate-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity text-xs leading-none shrink-0"
-              >×</button>
+              <button onClick={(e) => handleDelete(e, s.sessionId)}
+                className="ml-1 text-slate-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity text-xs leading-none shrink-0">×</button>
             </div>
           ))}
         </div>

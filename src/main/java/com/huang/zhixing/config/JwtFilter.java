@@ -1,6 +1,7 @@
 package com.huang.zhixing.config;
 
 import com.huang.zhixing.common.JwtUtil;
+import com.huang.zhixing.common.UserContext;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,7 +46,11 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         String username = jwtUtil.getUsernameFromToken(token);
-        request.setAttribute("currentUser", username);
-        chain.doFilter(request, response);
+        UserContext.set(username);
+        try {
+            chain.doFilter(request, response);
+        } finally {
+            UserContext.clear();
+        }
     }
 }
