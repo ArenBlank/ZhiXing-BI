@@ -110,7 +110,7 @@ export default function ChatPage() {
   return (
     <div className="flex h-screen overflow-hidden bg-white">
       <ParticleBackground />
-      <HistorySidebar userId={userId} activeSessionId={sessionId} onSwitch={switchSession} onNew={createSession} onDelete={(sid) => { if (sid === sessionId) createSession(); }} refreshKey={sidebarKey} />
+      <HistorySidebar userId={userId} activeSessionId={sessionId} onSwitch={switchSession} onNew={createSession} onDelete={(sid) => { if (sid === sessionId) createSession(); setSidebarKey(k => k + 1); }} refreshKey={sidebarKey} />
       <main className="flex-1 flex flex-col min-w-0">
         <header className="h-14 flex items-center px-6 border-b border-blue-200 glass-panel shrink-0">
           <span className="text-sm font-bold tracking-widest text-blue-600 uppercase">ZhiXing-BI</span>
