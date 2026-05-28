@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 
-import { API_BASE } from "@/lib/api";
+import { API_BASE, authHeaders } from "@/lib/api";
 const SUPPORTED = ".pdf,.docx,.xlsx,.pptx,.md,.txt";
 const MAX_FILES = 7;
 
@@ -40,7 +40,7 @@ export default function FileUploader({ userId, sessionId, onUploaded }) {
     toUpload.forEach((file, idx) => {
       const fileId = newFiles[idx].id;
       const fd = new FormData(); fd.append("file", file);
-      fetch(`${API_BASE}/api/file/upload-and-index?userId=${userId}&sessionId=${sessionId}`, { method: "POST", body: fd })
+      fetch(`${API_BASE}/api/file/upload-and-index?userId=${userId}&sessionId=${sessionId}`, { method: "POST", headers: authHeaders(), body: fd })
         .then(r => r.json())
         .then(json => {
           setFiles(prev => prev.map(f => f.id === fileId ? { ...f, status: json.code === 200 ? "done" : "error", type: json.data?.fileType } : f));

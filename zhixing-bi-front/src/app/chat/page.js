@@ -8,7 +8,7 @@ import ParticleBackground from "@/components/ParticleBackground";
 import { getAuth, clearAuth, isLoggedIn } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 
-import { API_BASE } from "@/lib/api";
+import { API_BASE, authHeaders } from "@/lib/api";
 const MOCK_MESSAGES = [
   { role: "user", content: "西北大学是211大学吗？" },
   { role: "assistant", content: "是的，西北大学（Northwest University）位于陕西省西安市，是中国国家\"211工程\"重点建设高校之一，也是首批国家\"双一流\"世界一流学科建设高校。" },
@@ -44,7 +44,7 @@ export default function ChatPage() {
 
   const createSession = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/session/create?userId=${userId}&title=新会话`, { method: "POST" });
+      const res = await fetch(`${API_BASE}/api/session/create?userId=${userId}&title=新会话`, { method: "POST", headers: authHeaders() });
       const json = await res.json();
       if (json.code === 200) { setSessionId(json.data.sessionId); setMessages([]); setSidebarKey(k => k + 1); return; }
     } catch {}
@@ -83,7 +83,7 @@ export default function ChatPage() {
       }
       const finalPrompt = (webSearchOn ? "【用户要求联网搜索，请务必调用webSearch工具搜索最新信息】" : "") + contextPrefix + prompt;
       const fd = new URLSearchParams(); fd.append("userId", userId); fd.append("sessionId", sessionId); fd.append("userPrompt", finalPrompt);
-      const res = await fetch(`${API_BASE}/api/agent/chat`, { method: "POST", body: fd });
+      const res = await fetch(`${API_BASE}/api/agent/chat`, { method: "POST", headers: authHeaders(), body: fd });
       const json = await res.json();
       if (json.code === 200) {
         setMessages(prev => prev.map(m => m.id === thinkId ? { role: "assistant", content: json.data.response } : m));

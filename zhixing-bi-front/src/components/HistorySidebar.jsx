@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { API_BASE } from "@/lib/api";
+import { API_BASE, authHeaders } from "@/lib/api";
 
 export default function HistorySidebar({ userId, activeSessionId, onSwitch, onNew, onDelete, refreshKey }) {
   const [sessions, setSessions] = useState([]);
@@ -9,7 +9,7 @@ export default function HistorySidebar({ userId, activeSessionId, onSwitch, onNe
   const listRef = useRef(null);
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/session/list?userId=${userId}`)
+    fetch(`${API_BASE}/api/session/list?userId=${userId}`, { headers: authHeaders() })
       .then(r => r.json()).then(json => { if (json.code === 200) setSessions(json.data); }).catch(() => {});
   }, [userId, refreshKey]);
 
@@ -26,7 +26,7 @@ export default function HistorySidebar({ userId, activeSessionId, onSwitch, onNe
   const handleDelete = async (e, sessionId) => {
     e.preventDefault();
     e.stopPropagation();
-    await fetch(`${API_BASE}/api/session/delete?userId=${userId}&sessionId=${sessionId}`, { method: "DELETE" });
+    await fetch(`${API_BASE}/api/session/delete?userId=${userId}&sessionId=${sessionId}`, { method: "DELETE", headers: authHeaders() });
     setSessions(prev => prev.filter(s => s.sessionId !== sessionId));
     onDelete?.(sessionId);
   };

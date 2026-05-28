@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ParticleBackground from "@/components/ParticleBackground";
-import { login, register } from "@/lib/auth";
+import { setAuth } from "@/lib/auth";
+import { API_BASE } from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,7 +14,7 @@ export default function LoginPage() {
   const [confirmPwd, setConfirmPwd] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -30,12 +31,22 @@ export default function LoginPage() {
       return;
     }
 
-    const result = mode === "login"
-      ? login(username.trim(), password)
-      : register(username.trim(), password);
-
-    if (!result.ok) { setError(result.error); return; }
-    router.push("/chat");
+    try {
+      const endpoint = mode === "login" ? "/api/user/login" : "/api/user/register";
+      const fd = new URLSearchParams();
+      fd.append("username", username.trim());
+      fd.append("password", password);
+      const res = await fetch(`${API_BASE}${endpoint}`, { method: "POST", body: fd });
+      const json = await res.json();
+      if (json.code === 200) {
+        setAuth({ username: json.data.username, token: json.data.token });
+        router.push("/chat");
+      } else {
+        setError(json.message);
+      }
+    } catch (e) {
+      setError("网络错误，请确认后端服务已启动");
+    }
   };
 
   return (
