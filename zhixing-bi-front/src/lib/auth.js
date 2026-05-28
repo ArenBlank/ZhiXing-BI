@@ -1,14 +1,14 @@
 "use client";
 
-const SESSION_KEY = "zhixing_session";
+const TOKEN_KEY = "zhixing_session";
 
 export function setAuth(data) {
-  localStorage.setItem(SESSION_KEY, JSON.stringify(data));
+  localStorage.setItem(TOKEN_KEY, JSON.stringify(data));
 }
 
 export function getAuth() {
   if (typeof window === "undefined") return null;
-  try { return JSON.parse(localStorage.getItem(SESSION_KEY)); }
+  try { return JSON.parse(localStorage.getItem(TOKEN_KEY)); }
   catch { return null; }
 }
 
@@ -17,7 +17,7 @@ export function getToken() {
 }
 
 export function clearAuth() {
-  localStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(TOKEN_KEY);
 }
 
 export function isLoggedIn() {
