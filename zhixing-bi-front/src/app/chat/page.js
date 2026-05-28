@@ -17,7 +17,6 @@ const MOCK_MESSAGES = [
 export default function ChatPage() {
   const router = useRouter();
   const auth = getAuth();
-  const [mounted, setMounted] = useState(false);
   const [authorized, setAuthorized] = useState(false);
   const [sessionId, setSessionId] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -95,7 +94,7 @@ export default function ChatPage() {
     setSidebarKey(k => k + 1);
   };
 
-  if (!authorized || !mounted) return (
+  if (!authorized) return (
     <div className="flex h-screen overflow-hidden bg-white">
       <ParticleBackground />
       <div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 border-2 border-blue-200 border-t-blue-500 rounded-full animate-spin" /></div>
