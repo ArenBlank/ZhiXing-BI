@@ -85,8 +85,8 @@ export default function ChatPage() {
         const lines = buffer.split("\n");
         buffer = lines.pop();
         for (const line of lines) {
-          if (line) {
-            full += line;
+          if (line && line.startsWith("data:")) {
+            full += line.slice(5).trimStart();
             setMessages(prev => prev.map(m => m.id === thinkId ? { ...m, content: full, thinking: false } : m));
           }
         }

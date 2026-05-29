@@ -97,8 +97,11 @@ public class ChatSessionService {
 
         // 首次用户消息 → 用提问内容自动生成会话标题
         if ("user".equals(role) && "新会话".equals(session.getTitle())) {
-            String title = content.length() > 30 ? content.substring(0, 30) : content;
-            title = title.replace("\n", " ").trim();
+            String title = content
+                .replaceFirst("【用户要求联网搜索[^】]*】", "")
+                .replaceFirst("【用户已上传文件[^】]*】", "")
+                .trim();
+            if (title.length() > 30) title = title.substring(0, 30);
             session.setTitle(title);
             sessionMapper.updateById(session);
         }
