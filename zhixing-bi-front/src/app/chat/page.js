@@ -63,9 +63,11 @@ export default function ChatPage() {
     }
     setMessages(prev => [...prev, { role: "user", content: prompt }]);
     const thinkId = Date.now();
+    let done = false;
     setMessages(prev => [...prev, { role: "assistant", content: "ZhiXing-BI 正在思考中，请稍后...", thinking: true, id: thinkId }]);
     chatRef.current?.scrollToBottom();
     const timer = setInterval(() => {
+      if (done) return;
       const elapsed = Math.floor((Date.now() - thinkId) / 1000);
       setMessages(prev => prev.map(m => m.id === thinkId ? { ...m, content: `思考中 (${elapsed}s)...` } : m));
     }, 1000);
@@ -76,6 +78,7 @@ export default function ChatPage() {
 
       const res = await fetch(`${API_BASE}/api/agent/chat`, { method: "POST", headers: authHeaders(), body: fd });
       const json = await res.json();
+      done = true;
       clearInterval(timer);
       if (json.code === 200) {
         setMessages(prev => prev.map(m => m.id === thinkId ? { role: "assistant", content: json.data.response, thinking: false } : m));
@@ -84,6 +87,7 @@ export default function ChatPage() {
         setMessages(prev => prev.map(m => m.id === thinkId ? { role: "assistant", content: "错误: " + json.message, thinking: false } : m));
       }
     } catch (e) {
+      done = true;
       clearInterval(timer);
       setMessages(prev => prev.map(m => m.id === thinkId ? { role: "assistant", content: "请求失败: " + e.message } : m));
     }
