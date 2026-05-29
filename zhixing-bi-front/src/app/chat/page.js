@@ -101,6 +101,14 @@ export default function ChatPage() {
     } else setMessages(prev => prev.map(m => m.id === thinkId ? { role: "assistant", content: `错误: ${json.message}` } : m));
   };
 
+  const retryLast = () => {
+    const lastUser = [...messages].reverse().find(m => m.role === "user");
+    if (lastUser) {
+      setMessages(prev => prev.slice(0, -1)); // remove last AI msg
+      handleSend(lastUser.content);
+    }
+  };
+
   const handleFileUploaded = (result) => {
     setUploadedFiles(prev => { if (prev.includes(result.fileName)) return prev; return [...prev, result.fileName]; });
     setSidebarKey(k => k + 1);
@@ -126,7 +134,7 @@ export default function ChatPage() {
         </header>
         <div className="flex-1 flex flex-col overflow-hidden px-6 py-4 gap-4">
           <FileUploader sessionId={sessionId} onUploaded={handleFileUploaded} />
-          <ChatConsole ref={chatRef} messages={messages} onSend={handleSend} webSearchOn={webSearchOn} setWebSearchOn={setWebSearchOn} />
+          <ChatConsole ref={chatRef} messages={messages} onSend={handleSend} onRetry={retryLast} webSearchOn={webSearchOn} setWebSearchOn={setWebSearchOn} />
         </div>
       </main>
     </div>

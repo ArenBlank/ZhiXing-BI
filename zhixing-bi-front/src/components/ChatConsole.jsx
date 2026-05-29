@@ -3,11 +3,16 @@
 import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from "react";
 import ReactMarkdown from "react-markdown";
 
-const ChatConsole = forwardRef(function ChatConsole({ messages, onSend, webSearchOn, setWebSearchOn }, ref) {
+const ChatConsole = forwardRef(function ChatConsole({ messages, onSend, onRetry, webSearchOn, setWebSearchOn }, ref) {
   const [input, setInput] = useState("");
+  const [copiedId, setCopiedId] = useState(null);
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
   const prevCountRef = useRef(0);
+
+  const copyText = async (text, msgId) => {
+    try { await navigator.clipboard.writeText(text); setCopiedId(msgId); setTimeout(() => setCopiedId(null), 1500); } catch {}
+  };
 
   useImperativeHandle(ref, () => ({ scrollToBottom: () => bottomRef.current?.scrollIntoView({ behavior: "smooth" }) }));
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
@@ -44,6 +49,16 @@ const ChatConsole = forwardRef(function ChatConsole({ messages, onSend, webSearc
               {msg.thinking && <span className="text-[10px] text-slate-300 mt-1 block">思考中...</span>}
               {msg.role === "assistant" && i === messages.length - 1 && !msg.thinking && <span className="inline-block w-2 h-4 bg-blue-500 rounded-sm ml-0.5 cursor-blink align-text-bottom" />}
             </div>
+            {!msg.thinking && (
+              <div className={`flex gap-1 mt-1 ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                <button onClick={() => copyText(msg.content, msg.id || i)} className="text-[10px] text-slate-300 hover:text-slate-500 transition-colors">
+                  {copiedId === (msg.id || i) ? "已复制" : "复制"}
+                </button>
+                {msg.role === "assistant" && onRetry && (
+                  <button onClick={onRetry} className="text-[10px] text-slate-300 hover:text-blue-500 transition-colors ml-1">重新生成</button>
+                )}
+              </div>
+            )}
           </div>
         ))}
         <div ref={bottomRef} />
