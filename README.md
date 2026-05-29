@@ -15,6 +15,7 @@
 | 工具 | 功能 |
 |------|------|
 | webSearch | DuckDuckGo 全网检索 + 天气查询（wttr.in） |
+| stockQuery | A 股实时行情查询（新浪财经 API） |
 | getCurrentDateTime | 获取当前系统日期时间 |
 
 **Agent 技能系统** — 从 awesome-llm-apps 开源社区移植的四套商业分析思考框架，大模型根据用户意图自动激活：
@@ -78,11 +79,11 @@ npm run dev
 ZhiXing-BI/
 ├── src/main/java/com/huang/zhixing/
 │   ├── agent/
-│   │   ├── tools/         # 工具链 (WebSearch, DateTime)
-│   │   └── skills/        # Agent 技能 (数据分析, 决策, 战略, 调研)
+│   │   ├── tools/         # 工具链 (WebSearch, Stock, DateTime)
+│   │   └── skills/        # Agent 技能 (数据分析/决策/战略/调研)
 │   ├── common/            # Result, AOP审计, JWT, ThreadLocal
 │   ├── config/            # Spring AI, Redis, CORS, JWT Filter
-│   ├── controller/        # REST 接口
+│   ├── controller/        # REST 接口 (含 UserController)
 │   ├── mapper/            # MyBatis-Plus Mapper
 │   ├── model/             # Entity, DTO
 │   ├── parser/            # 文件解析引擎 (工厂+模板)
@@ -90,5 +91,5 @@ ZhiXing-BI/
 ├── zhixing-bi-front/      # Next.js 前端
 ├── docker-compose.yml
 ├── pom.xml
-└── start.txt              # 后端启动命令
+├── start.ps1 / stop.ps1   # 一键启停脚本
 ```
