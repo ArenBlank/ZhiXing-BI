@@ -1,6 +1,8 @@
 import { getToken } from "./auth";
 
-export const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8099";
+export const API_BASE = typeof window !== "undefined" && window.location.hostname === "localhost"
+  ? "http://localhost:8099"
+  : "https://zhixingbi.vip.cpolar.cn";
 
 export function authHeaders() {
   const token = getToken();
