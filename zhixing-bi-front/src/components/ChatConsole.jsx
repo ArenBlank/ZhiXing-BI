@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from "react";
+import ReactMarkdown from "react-markdown";
 
 const ChatConsole = forwardRef(function ChatConsole({ messages, onSend, webSearchOn, setWebSearchOn }, ref) {
   const [input, setInput] = useState("");
@@ -33,7 +34,13 @@ const ChatConsole = forwardRef(function ChatConsole({ messages, onSend, webSearc
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
             <div className={`msg-bubble max-w-[75%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${msg.role === "user" ? "bg-blue-500 text-white rounded-br-md" : msg.thinking ? "bg-slate-50 text-slate-400 rounded-bl-md border border-slate-200" : "bg-slate-100 text-slate-700 rounded-bl-md border border-slate-200"}`}>
-              <div className="whitespace-pre-wrap">{msg.content}</div>
+              {msg.role === "assistant" ? (
+                <div className="prose prose-sm max-w-none prose-p:my-1 prose-strong:text-slate-800 prose-strong:font-semibold">
+                  <ReactMarkdown>{msg.content}</ReactMarkdown>
+                </div>
+              ) : (
+                <div className="whitespace-pre-wrap">{msg.content}</div>
+              )}
               {msg.thinking && <span className="text-[10px] text-slate-300 mt-1 block">思考中...</span>}
               {msg.role === "assistant" && i === messages.length - 1 && !msg.thinking && <span className="inline-block w-2 h-4 bg-blue-500 rounded-sm ml-0.5 cursor-blink align-text-bottom" />}
             </div>
