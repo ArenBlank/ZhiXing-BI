@@ -74,32 +74,19 @@ export default function ChatPage() {
       const ctxPrefix = uploadedFiles.length === 1 ? "【用户已上传文件：" + uploadedFiles[0] + "，如提问涉及总结分析等模糊指令，默认指此文件】" : "";
       const fd = new URLSearchParams(); fd.append("sessionId", sessionId); fd.append("userPrompt", ctxPrefix + finalPrompt);
 
-      const res = await fetch(`${API_BASE}/api/agent/chat/stream`, { method: "POST", headers: authHeaders(), body: fd });
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let full = "", firstChunk = true;
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const text = decoder.decode(value, { stream: true });
-        // SSE 格式: 每行可能是 "data:xxx" 或空行, 去掉 "data:" 前缀和空白行
-        const lines = text.split("\n");
-        for (const line of lines) {
-          const clean = line.trim();
-          if (!clean || clean === "data:" || clean === "data: ") continue;
-          const chunk = clean.startsWith("data:") ? clean.slice(5) : clean;
-          if (firstChunk) { clearInterval(timer); firstChunk = false; }
-          full += chunk;
-          setMessages(prev => prev.map(m => m.id === thinkId ? { ...m, content: full, thinking: true } : m));
-        }
-      }
+      const res = await fetch(`${API_BASE}/api/agent/chat`, { method: "POST", headers: authHeaders(), body: fd });
+      const json = await res.json();
       clearInterval(timer);
-      setMessages(prev => prev.map(m => m.id === thinkId ? { ...m, content: full || "(empty)", thinking: false } : m));
+      if (json.code === 200) {
+        setMessages(prev => prev.map(m => m.id === thinkId ? { role: "assistant", content: json.data.response, thinking: false } : m));
+        setSidebarKey(k => k + 1);
+      } else {
+        setMessages(prev => prev.map(m => m.id === thinkId ? { role: "assistant", content: "错误: " + json.message, thinking: false } : m));
+      }
     } catch (e) {
       clearInterval(timer);
       setMessages(prev => prev.map(m => m.id === thinkId ? { role: "assistant", content: "请求失败: " + e.message } : m));
     }
-    setSidebarKey(k => k + 1);
     chatRef.current?.scrollToBottom();
   };
 
