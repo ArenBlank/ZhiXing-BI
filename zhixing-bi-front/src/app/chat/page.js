@@ -69,7 +69,7 @@ export default function ChatPage() {
     const timer = setInterval(() => {
       if (done) return;
       const elapsed = Math.floor((Date.now() - thinkId) / 1000);
-      setMessages(prev => prev.map(m => m.id === thinkId ? { ...m, content: `思考中 (${elapsed}s)...` } : m));
+      setMessages(prev => prev.map(m => m.id === thinkId ? { ...m, content: `ZhiXing-BI 正在思考中，请稍后 (${elapsed}s)...` } : m));
     }, 1000);
     try {
       const finalPrompt = webSearchOn ? "【用户要求联网搜索，请务必调用webSearch工具搜索最新信息】" + prompt : prompt;

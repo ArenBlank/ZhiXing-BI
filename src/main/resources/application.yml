@@ -25,7 +25,7 @@ spring:
       base-url: https://api.deepseek.com
       chat:
         options:
-          model: deepseek-chat
+          model: deepseek-v4-flash
     ollama:
       base-url: http://localhost:11434
       embedding:
