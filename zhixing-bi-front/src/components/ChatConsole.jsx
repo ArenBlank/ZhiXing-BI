@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from "react";
 import ReactMarkdown from "react-markdown";
+import { Copy, RefreshCw } from "lucide-react";
 
 const ChatConsole = forwardRef(function ChatConsole({ messages, onSend, onRetry, webSearchOn, setWebSearchOn }, ref) {
   const [input, setInput] = useState("");
@@ -50,12 +51,22 @@ const ChatConsole = forwardRef(function ChatConsole({ messages, onSend, onRetry,
               {msg.role === "assistant" && i === messages.length - 1 && !msg.thinking && <span className="inline-block w-2 h-4 bg-blue-500 rounded-sm ml-0.5 cursor-blink align-text-bottom" />}
             </div>
             {!msg.thinking && (
-              <div className={`flex gap-1 mt-1 ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                <button onClick={() => copyText(msg.content, msg.id || i)} className="text-[10px] text-slate-300 hover:text-slate-500 transition-colors">
-                  {copiedId === (msg.id || i) ? "已复制" : "复制"}
+              <div className={`flex gap-0.5 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                <button
+                  onClick={() => copyText(msg.content, msg.id || i)}
+                  className="p-1 rounded hover:bg-slate-200 transition-all active:scale-90"
+                  title="复制"
+                >
+                  <Copy size={12} className={copiedId === (msg.id || i) ? "text-emerald-500" : "text-slate-400"} />
                 </button>
                 {msg.role === "assistant" && onRetry && (
-                  <button onClick={onRetry} className="text-[10px] text-slate-300 hover:text-blue-500 transition-colors ml-1">重新生成</button>
+                  <button
+                    onClick={onRetry}
+                    className="p-1 rounded hover:bg-slate-200 transition-all active:scale-90"
+                    title="重新生成"
+                  >
+                    <RefreshCw size={12} className="text-slate-400 hover:text-blue-500" />
+                  </button>
                 )}
               </div>
             )}
