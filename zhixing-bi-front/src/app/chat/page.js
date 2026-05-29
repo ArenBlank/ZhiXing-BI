@@ -63,11 +63,11 @@ export default function ChatPage() {
     }
     setMessages(prev => [...prev, { role: "user", content: prompt }]);
     const thinkId = Date.now();
-    setMessages(prev => [...prev, { role: "assistant", content: "", thinking: true, id: thinkId }]);
+    setMessages(prev => [...prev, { role: "assistant", content: "ZhiXing-BI 正在思考中，请稍后...", thinking: true, id: thinkId }]);
     chatRef.current?.scrollToBottom();
     const timer = setInterval(() => {
       const elapsed = Math.floor((Date.now() - thinkId) / 1000);
-      setMessages(prev => prev.map(m => m.id === thinkId ? { ...m, content: `正在思考 (${elapsed}s)...` } : m));
+      setMessages(prev => prev.map(m => m.id === thinkId ? { ...m, content: `思考中 (${elapsed}s)...` } : m));
     }, 1000);
     try {
       const finalPrompt = webSearchOn ? "【用户要求联网搜索，请务必调用webSearch工具搜索最新信息】" + prompt : prompt;
@@ -77,26 +77,28 @@ export default function ChatPage() {
       const res = await fetch(`${API_BASE}/api/agent/chat/stream`, { method: "POST", headers: authHeaders(), body: fd });
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
-      let full = "", buffer = "";
+      let full = "", firstChunk = true;
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop();
+        const text = decoder.decode(value, { stream: true });
+        // SSE 格式: 每行可能是 "data:xxx" 或空行, 去掉 "data:" 前缀和空白行
+        const lines = text.split("\n");
         for (const line of lines) {
-          if (line && line.startsWith("data:")) {
-            full += line.slice(5).trimStart();
-            setMessages(prev => prev.map(m => m.id === thinkId ? { ...m, content: full, thinking: true } : m));
-          }
+          const clean = line.trim();
+          if (!clean || clean === "data:" || clean === "data: ") continue;
+          const chunk = clean.startsWith("data:") ? clean.slice(5) : clean;
+          if (firstChunk) { clearInterval(timer); firstChunk = false; }
+          full += chunk;
+          setMessages(prev => prev.map(m => m.id === thinkId ? { ...m, content: full, thinking: true } : m));
         }
       }
+      clearInterval(timer);
       setMessages(prev => prev.map(m => m.id === thinkId ? { ...m, content: full || "(empty)", thinking: false } : m));
     } catch (e) {
       clearInterval(timer);
       setMessages(prev => prev.map(m => m.id === thinkId ? { role: "assistant", content: "请求失败: " + e.message } : m));
     }
-    clearInterval(timer);
     setSidebarKey(k => k + 1);
     chatRef.current?.scrollToBottom();
   };
