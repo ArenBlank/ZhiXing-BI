@@ -38,7 +38,7 @@ const ChatConsole = forwardRef(function ChatConsole({ messages, onSend, onRetry,
           <div className="flex items-center justify-center h-full"><p className="text-sm text-slate-400">上传文件或输入问题，开启智能分析</p></div>
         )}
         {messages.map((msg, i) => (
-          <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+          <div key={i} className={`flex group ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
             <div className={`msg-bubble max-w-[75%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${msg.role === "user" ? "bg-blue-500 text-white rounded-br-md" : msg.thinking ? "bg-slate-50 text-slate-400 rounded-bl-md border border-slate-200" : "bg-slate-100 text-slate-700 rounded-bl-md border border-slate-200"}`}>
               {msg.role === "assistant" ? (
                 <div className="prose prose-sm max-w-none prose-p:my-1 prose-strong:text-slate-800 prose-strong:font-semibold">
