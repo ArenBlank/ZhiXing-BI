@@ -38,38 +38,32 @@ const ChatConsole = forwardRef(function ChatConsole({ messages, onSend, onRetry,
           <div className="flex items-center justify-center h-full"><p className="text-sm text-slate-400">上传文件或输入问题，开启智能分析</p></div>
         )}
         {messages.map((msg, i) => (
-          <div key={i} className={`flex group ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div className={`msg-bubble max-w-[75%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${msg.role === "user" ? "bg-blue-500 text-white rounded-br-md" : msg.thinking ? "bg-slate-50 text-slate-400 rounded-bl-md border border-slate-200" : "bg-slate-100 text-slate-700 rounded-bl-md border border-slate-200"}`}>
-              {msg.role === "assistant" ? (
-                <div className="prose prose-sm max-w-none prose-p:my-1 prose-strong:text-slate-800 prose-strong:font-semibold">
-                  <ReactMarkdown>{msg.content}</ReactMarkdown>
-                </div>
-              ) : (
-                <div className="whitespace-pre-wrap">{msg.content}</div>
-              )}
-              {msg.thinking && <span className="text-[10px] text-slate-300 mt-1 block">思考中...</span>}
-              {msg.role === "assistant" && i === messages.length - 1 && !msg.thinking && <span className="inline-block w-2 h-4 bg-blue-500 rounded-sm ml-0.5 cursor-blink align-text-bottom" />}
-            </div>
-            {!msg.thinking && (
-              <div className={`flex gap-0.5 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                <button
-                  onClick={() => copyText(msg.content, msg.id || i)}
-                  className="p-1 rounded hover:bg-slate-200 transition-all active:scale-90"
-                  title="复制"
-                >
-                  <Copy size={12} className={copiedId === (msg.id || i) ? "text-emerald-500" : "text-slate-400"} />
-                </button>
-                {msg.role === "assistant" && onRetry && (
-                  <button
-                    onClick={onRetry}
-                    className="p-1 rounded hover:bg-slate-200 transition-all active:scale-90"
-                    title="重新生成"
-                  >
-                    <RefreshCw size={12} className="text-slate-400 hover:text-blue-500" />
-                  </button>
+          <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+            <div className="flex flex-col group max-w-[75%]">
+              <div className={`msg-bubble px-4 py-3 rounded-2xl text-sm leading-relaxed ${msg.role === "user" ? "bg-blue-500 text-white rounded-br-md" : msg.thinking ? "bg-slate-50 text-slate-400 rounded-bl-md border border-slate-200" : "bg-slate-100 text-slate-700 rounded-bl-md border border-slate-200"}`}>
+                {msg.role === "assistant" ? (
+                  <div className="prose prose-sm max-w-none prose-p:my-1 prose-strong:text-slate-800 prose-strong:font-semibold">
+                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                  </div>
+                ) : (
+                  <div className="whitespace-pre-wrap">{msg.content}</div>
                 )}
+                {msg.thinking && <span className="text-[10px] text-slate-300 mt-1 block">思考中...</span>}
+                {msg.role === "assistant" && i === messages.length - 1 && !msg.thinking && <span className="inline-block w-2 h-4 bg-blue-500 rounded-sm ml-0.5 cursor-blink align-text-bottom" />}
               </div>
-            )}
+              {!msg.thinking && (
+                <div className="flex gap-1 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button onClick={() => copyText(msg.content, msg.id || i)} className="p-1 rounded hover:bg-slate-200 transition-all active:scale-90" title="复制">
+                    <Copy size={12} className={copiedId === (msg.id || i) ? "text-emerald-500" : "text-slate-400"} />
+                  </button>
+                  {msg.role === "assistant" && onRetry && (
+                    <button onClick={onRetry} className="p-1 rounded hover:bg-slate-200 transition-all active:scale-90" title="重新生成">
+                      <RefreshCw size={12} className="text-slate-400 hover:text-blue-500" />
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         ))}
         <div ref={bottomRef} />
